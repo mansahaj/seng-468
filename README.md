@@ -22,59 +22,84 @@ This is a Python Flask application that provides a REST API for an online bookst
 └─────────┘      └──────────────┘      └────────────┘
 ```
 
-## Setup
-
-### Prerequisites
+## Prerequisites
 
 - Docker and Docker Compose
-- curl or httpie (for testing)
-- Load testing tool (wrk, Apache Bench, or Locust)
+- curl (for testing)
+- Load testing tool: wrk, Apache Bench, or Locust
 
-### Quick Start
+## Quick Start
 
-1. **Clone the repository**
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/uvic-seng468/assignment1-bookstore.git
 cd assignment1-bookstore
 ```
 
-2. **Start the application**
+### 2. Start the Application
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
-3. **Wait for services to be ready** (about 10 seconds)
+### 3. Wait for Services to Start
 ```bash
-# Check if app is running
+sleep 15
+```
+
+### 4. Load Sample Data
+```bash
+docker compose exec app python scripts/load_data.py
+```
+
+This generates:
+- **10,000 books** with titles, authors, prices, and descriptions
+- **1,000 users** with unique usernames and emails
+- **5,000 reviews** with ratings and comments
+
+### 5. Test the API
+
+**Quick test with automated script:**
+```bash
+chmod +x test_endpoints.sh
+./test_endpoints.sh
+```
+
+**Or test manually:**
+```bash
+# Check health
 curl http://localhost:5000/health
-```
 
-4. **Load sample data**
-```bash
-docker-compose exec app python scripts/load_data.py
-```
-
-This will generate:
-- 10,000 books
-- 1,000 users  
-- 5,000 reviews
-
-5. **Verify data loaded**
-```bash
+# List books
 curl http://localhost:5000/api/books | jq '.total'
 # Should return: 10000
 ```
 
-### Stopping the Application
+---
 
-```bash
-docker-compose down
+## Windows WSL2 Users - Troubleshooting
+
+If you get **"connection timeout"** or **"could not translate host name"** errors when loading data:
+
+**Edit `docker-compose.yml` line 25:**
+
+**Change FROM:**
+```yaml
+DATABASE_URL: postgresql://bookstore:password@db:5432/bookstore
 ```
 
-To remove all data:
-```bash
-docker-compose down -v
+**Change TO:**
+```yaml
+DATABASE_URL: postgresql://bookstore:password@172.18.0.1:5432/bookstore
 ```
+
+Then restart:
+```bash
+docker compose restart app
+sleep 5
+docker compose exec app python scripts/load_data.py
+```
+
+---
 
 ## API Endpoints
 
@@ -94,7 +119,7 @@ GET /api/books/:id
 curl http://localhost:5000/api/books/1
 ```
 
-**Create book (admin)**
+**Create book**
 ```bash
 POST /api/books
 
@@ -160,7 +185,7 @@ curl -X POST http://localhost:5000/api/checkout \
   -d '{"user_id": 1}'
 ```
 
-## Load Testing Examples
+## Load Testing
 
 ### Using wrk
 
@@ -212,39 +237,39 @@ Run:
 locust -f locustfile.py --host=http://localhost:5000
 ```
 
-## Profiling Examples
+## Profiling
 
 ### CPU Profiling with cProfile
 
 ```bash
 # Profile the application
-docker-compose exec app python -m cProfile -o profile.stats app.py
+docker compose exec app python -m cProfile -o profile.stats app.py
 
 # Analyze results
-docker-compose exec app python -c "
+docker compose exec app python -c "
 import pstats
 p = pstats.Stats('profile.stats')
 p.sort_stats('cumulative').print_stats(20)
 "
 ```
 
-### Memory Profiling with memory_profiler
+### Memory Profiling
 
 Add `@profile` decorator to functions in `app.py`, then:
 
 ```bash
-docker-compose exec app python -m memory_profiler app.py
+docker compose exec app python -m memory_profiler app.py
 ```
 
 ### Database Query Logging
 
-PostgreSQL slow query log is automatically enabled. View logs:
+View PostgreSQL slow query logs:
 
 ```bash
-docker-compose logs db | grep "duration"
+docker compose logs db | grep "duration"
 ```
 
-### Enable SQLAlchemy Query Logging
+### SQLAlchemy Query Logging
 
 Add to `app.py`:
 ```python
@@ -255,7 +280,7 @@ logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 ## Known Performance Issues
 
-The application has several **intentional** performance problems:
+The application has several **intentional** performance problems for you to discover:
 
 1. **N+1 Query Problems**
    - Book listing fetches reviews separately for each book
@@ -292,7 +317,7 @@ The application has several **intentional** performance problems:
 Use load testing and profiling to:
 
 1. **Measure** baseline performance
-2. **Identify** these bottlenecks systematically
+2. **Identify** bottlenecks systematically
 3. **Profile** to find exact locations in code
 4. **Recommend** specific fixes with expected impact
 
@@ -300,54 +325,75 @@ Use load testing and profiling to:
 
 ## Troubleshooting
 
-### Port already in use
+### Port Already in Use
 ```bash
-# Change ports in docker-compose.yml
+# Stop existing containers
+docker compose down
+
+# Or change ports in docker-compose.yml
 ports:
   - "5001:5000"  # Use port 5001 instead
+  - "5433:5432"  # Use port 5433 instead
 ```
 
-### Database connection errors
+### Database Connection Issues (WSL2)
+
+If you see `connection timeout` errors:
+
+1. Edit `docker-compose.yml` line 25
+2. Change `@db:5432` to `@172.18.0.1:5432`
+3. Restart: `docker compose restart app`
+
+### Data Loading Fails
+
 ```bash
-# Wait longer for database to start
-docker-compose up -d
-sleep 10
-docker-compose exec app python scripts/load_data.py
+# Clean restart
+docker compose down -v
+docker compose up -d
+sleep 15
+docker compose exec app python scripts/load_data.py
 ```
 
-### Out of memory
+### View Logs
+
 ```bash
-# Reduce dataset size in scripts/load_data.py:
-load_books(1000)  # Instead of 10000
+# Application logs
+docker compose logs -f app
+
+# Database logs
+docker compose logs -f db
 ```
 
-### Permission denied
+### Clean Restart
+
 ```bash
-# Run with sudo on Linux
-sudo docker-compose up -d
+# Remove all containers and data
+docker compose down -v
+
+# Start fresh
+docker compose up -d
+sleep 15
+docker compose exec app python scripts/load_data.py
+```
+
+## Stopping the Application
+
+```bash
+# Stop containers (keeps data)
+docker compose down
+
+# Stop and remove all data
+docker compose down -v
 ```
 
 ## Tips for Success
 
-1. **Warm up the system**
-   - Run 5-10 minutes of load before measuring
-   - First queries are always slower
-
-2. **Test from separate machine**
-   - Don't run load tests on same server as app
-   - Or use separate Docker containers
-
-3. **Monitor resources**
-   - Watch CPU, memory, disk I/O during tests
-   - Use `docker stats` command
-
-4. **Profile under load**
-   - Profile while system is under realistic load
-   - Idle profiling won't show real bottlenecks
-
-5. **Read the code**
-   - Look for obvious issues in `app/app.py`
-   - But verify with profiling data!
+1. **Warm up the system** - Run 5-10 minutes of load before measuring
+2. **Test from separate machine** - Don't run load tests on same server as app
+3. **Monitor resources** - Use `docker stats` to watch CPU, memory, disk I/O
+4. **Profile under load** - Idle profiling won't show real bottlenecks
+5. **Read the code** - Look for obvious issues in `app/app.py`
+6. **Verify with data** - Use profiling to prove where problems are
 
 ## Database Schema
 
@@ -404,6 +450,21 @@ CREATE TABLE orders (
 );
 ```
 
+## Project Structure
+
+```
+bookstore-api/
+├── app/
+│   └── app.py              # Main Flask application
+├── scripts/
+│   └── load_data.py        # Data generation script
+├── docker-compose.yml      # Docker orchestration
+├── Dockerfile              # Container definition
+├── requirements.txt        # Python dependencies
+├── test_endpoints.sh       # Automated API testing script
+└── README.md              # This file
+```
+
 ## Resources
 
 - [Flask Documentation](https://flask.palletsprojects.com/)
@@ -412,6 +473,11 @@ CREATE TABLE orders (
 - [Python cProfile](https://docs.python.org/3/library/profile.html)
 - [SENG 468 Course Materials](https://bright.uvic.ca/d2l/home/467415)
 
+## Support
+
+For assignment questions:
+- Office hours: Tuesday/Thursday 2:00-4:00 PM
+- Discussion forum on Brightspace
 
 ## License
 
