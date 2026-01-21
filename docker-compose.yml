@@ -20,8 +20,10 @@ services:
     ports:
       - "5000:5000"
     environment:
-      # FIXED: Use gateway IP instead of 'db' hostname for WSL2 compatibility
-      DATABASE_URL: postgresql://bookstore:password@172.18.0.1:5432/bookstore
+      # For Native Linux or Mac
+      DATABASE_URL: postgresql://bookstore:password@db:5432/bookstore
+      # FIXED: Use gateway IP instead of 'db' hostname for WSL2 compatibility and not receiving timeout
+      # DATABASE_URL: postgresql://bookstore:password@172.18.0.1:5432/bookstore
       FLASK_APP: app.py
       FLASK_ENV: development
     depends_on:
