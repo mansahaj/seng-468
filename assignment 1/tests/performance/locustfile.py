@@ -1,5 +1,6 @@
 from locust import HttpUser, task, between, LoadTestShape
 import random
+import os
 
 class BookstoreUser(HttpUser):
     wait_time = between(1, 3)
@@ -61,10 +62,9 @@ class StepLoadShape(LoadTestShape):
     def tick(self):
         run_time = self.get_run_time()
         
-        # Check for time limit (e.g., stopping after a certain duration)
-        # You can set this via environment variable or hardcode
-        # For this assignment, let's stop after 30 minutes (1800s) to be safe
-        if run_time > 1800:
+        # Check for time limit from environment variable (default 30 mins)
+        stop_after = int(os.environ.get("STOP_AFTER", 1800))
+        if run_time > stop_after:
             return None
 
         # Calculate current step based on time
