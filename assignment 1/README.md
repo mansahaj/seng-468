@@ -196,7 +196,7 @@ wrk -t4 -c100 -d60s http://localhost:5000/api/books
 
 **Test search endpoint**
 ```bash
-wrk -t4 -c100 -d60s http://localhost:5000/api/search?q=great
+wrk -t4 -c100 -d60s "http://localhost:5000/api/search?q=great"
 ```
 
 **Test recommendations endpoint**

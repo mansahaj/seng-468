@@ -1,0 +1,25 @@
+Method,Name,Error,Occurrences
+GET,/api/books/4,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/4'),2
+GET,/api/search?q=Fiction,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/search?q=Fiction'),3
+GET,/api/search?q=History,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/search?q=History'),3
+GET,/api/books/9,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/9'),3
+GET,/api/books/17,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/17'),2
+GET,/api/books/5,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/5'),1
+GET,/api/recommendations,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/recommendations'),18
+GET,/api/books/10,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/10'),1
+GET,/api/books/6,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/6'),1
+GET,/api/books/16,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/16'),1
+GET,/api/books/11,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/11'),2
+GET,/api/search?q=Science,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/search?q=Science'),5
+GET,/api/books/12,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/12'),4
+GET,/api/books/8,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/8'),1
+GET,/api/search?q=Cook,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/search?q=Cook'),3
+GET,/api/books/3,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/3'),2
+GET,/api/books/20,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/20'),2
+POST,/api/checkout,CatchResponseError('<!doctype html>\n<html lang=en>\n<title>500 Internal Server Error</title>\n<h1>Internal Server Error</h1>\n<p>The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.</p>\n'),4
+GET,/api/books/13,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/13'),1
+GET,/api/books/14,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/14'),1
+GET,/api/books,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books'),20
+GET,/api/books/15,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/15'),3
+GET,/api/books/2,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/books/2'),1
+POST,/api/cart/add,HTTPError('500 Server Error: INTERNAL SERVER ERROR for url: /api/cart/add'),13
