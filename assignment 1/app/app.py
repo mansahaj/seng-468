@@ -31,8 +31,8 @@ class Book(db.Model):
     __tablename__ = 'books'
     
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(255), nullable=False, index = True)  # NO INDEX - intentional!
-    author = db.Column(db.String(255), nullable=False, index = True)  # NO INDEX - intentional!
+    title = db.Column(db.String(255), nullable=False, index = True)  
+    author = db.Column(db.String(255), nullable=False, index = True) 
     isbn = db.Column(db.String(13), unique=True)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     description = db.Column(db.Text)
