@@ -1,0 +1,2 @@
+Method,Name,Error,Occurrences
+POST,/api/checkout,HTTPError('400 Client Error: BAD REQUEST for url: /api/checkout'),9

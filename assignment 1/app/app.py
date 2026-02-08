@@ -31,8 +31,8 @@ class Book(db.Model):
     __tablename__ = 'books'
     
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(255), nullable=False)  # NO INDEX - intentional!
-    author = db.Column(db.String(255), nullable=False)  # NO INDEX - intentional!
+    title = db.Column(db.String(255), nullable=False, index = True)  
+    author = db.Column(db.String(255), nullable=False, index = True) 
     isbn = db.Column(db.String(13), unique=True)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     description = db.Column(db.Text)
@@ -384,4 +384,5 @@ def init_db():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    debug_mode = os.environ.get('FLASK_DEBUG', 'True') == 'True'
+    app.run(host='0.0.0.0', port=5000, debug=debug_mode)
